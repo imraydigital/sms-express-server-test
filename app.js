@@ -68,6 +68,7 @@ emitter.on('checkSchedule', () => {
   console.log('1 minute check for scheduled SMS...');
 
   // Send Text
+  /*
   const from = 'Liam Imray';
   const number = '447309008594'
   const text = 'SMS sent automatically from express back end'
@@ -82,7 +83,7 @@ emitter.on('checkSchedule', () => {
         console.log(`Message failed with error: ${responseData.messages[0]['error-text']}`);
       }
     }
-  })
+  })*/
 })
 
 // Raise schedule event every 15 minutes -- TIMER
