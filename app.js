@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const ejs = require('ejs');
-const socketio = require('socket.io');
+//const socketio = require('socket.io');
 const Vonage = require('@vonage/server-sdk');
 const EventEmitter = require('events');
 const emitter = new EventEmitter();
@@ -17,6 +17,9 @@ const vonage = new Vonage({
 //Init App
 
 const app = express();
+
+// 
+app.use(express.urlencoded({ extended: false }))
 
 //Template engine set up
 app.set('view engine', 'html');
@@ -56,6 +59,37 @@ app.post('/', (req, res) => {
   })
 })
 
+
+
+// Set server interval every 15 minutes to check for sms
+
+// Register listener for schedule event -- ACTION
+emitter.on('checkSchedule', () => {
+  console.log('1 minute check for scheduled SMS...');
+
+  // Send Text
+  const from = 'Liam Imray';
+  const number = '447309008594'
+  const text = 'SMS sent automatically from express back end'
+
+  vonage.message.sendSms(from, number, text, (err, responseData) => {
+    if (err) {
+      console.log(err);
+    } else {
+      if (responseData.messages[0]['status'] === "0") {
+        console.log("Message sent successfully.");
+      } else {
+        console.log(`Message failed with error: ${responseData.messages[0]['error-text']}`);
+      }
+    }
+  })
+})
+
+// Raise schedule event every 15 minutes -- TIMER
+setInterval(function () {
+  emitter.emit('checkSchedule');
+}, 1 * 60 * 1000);
+
 // Define PORT
 const PORT = process.env.PORT || 5000;
 
@@ -63,33 +97,3 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server started on PORT: ${PORT}`)
 })
-
-// Set server interval every 15 minutes to check for sms
-
-// Register listener for schedule event -- ACTION
-emitter.on('checkSchedule', () => {
-  console.log('15 minute check for scheduled SMS...');
-
-  // Send text
-
-  fetch('/', {
-    method: 'post',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      from: 'Liam Imray',
-      number: '447309008594',
-      text: 'Message sent from express server automatically every 15 minutes'
-    })
-  }).then((res) => {
-    console.log(res);
-  }).catch((err) => {
-    console.log(err)
-  })
-})
-
-// Raise schedule event every 15 minutes -- TIMER
-setInterval(function () {
-  emitter.emit('checkSchedule');
-}, 15 * 60 * 1000);
