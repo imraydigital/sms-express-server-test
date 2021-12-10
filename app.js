@@ -60,6 +60,8 @@ app.post('/', (req, res) => {
 })
 
 
+/* DISABLE AUTO TEXTING 
+
 
 // Set server interval every 15 minutes to check for sms
 
@@ -91,6 +93,9 @@ emitter.on('checkSchedule', () => {
 setInterval(function () {
   emitter.emit('checkSchedule');
 }, 10 * 60 * 1000);
+
+
+*/
 
 // Define PORT
 const PORT = process.env.PORT || 5000;
